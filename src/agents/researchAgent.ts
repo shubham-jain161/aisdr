@@ -1,4 +1,4 @@
-import { DuckDuckGoSearchAPI } from "@langchain/community/tools/duckduckgo_search";
+import { DuckDuckGoSearchAPI } from "@langchain/community/tools";
 import { ChatOpenAI } from "@langchain/openai";
 import { AZURE_OPENAI_CONFIG } from "../config/azure";
 import type { Lead } from "../types";
