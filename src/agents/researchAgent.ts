@@ -1,26 +1,26 @@
-import { DuckDuckGoSearchAPI } from "@langchain/community/tools";
+import { DuckDuckGoSearchResults } from "@langchain/community/tools/duckduckgo";
 import { ChatOpenAI } from "@langchain/openai";
 import { AZURE_OPENAI_CONFIG } from "../config/azure";
 import type { Lead } from "../types";
 
 export class ResearchAgent {
   private model: ChatOpenAI;
-  private searchTool: DuckDuckGoSearchAPI;
+  private searchTool: DuckDuckGoSearchResults;
 
   constructor() {
     this.model = new ChatOpenAI({
       azureOpenAIApiKey: AZURE_OPENAI_CONFIG.apiKey,
       azureOpenAIApiVersion: "2024-08-01",
       azureOpenAIApiDeploymentName: AZURE_OPENAI_CONFIG.deploymentName,
-      azureOpenAIApiInstanceName: "ai-gamaai623587016894",
+      azureOpenAIBasePath: AZURE_OPENAI_CONFIG.azureOpenAIBasePath,
     });
     
-    this.searchTool = new DuckDuckGoSearchAPI();
+    this.searchTool = new DuckDuckGoSearchResults();
   }
 
   async researchLead(lead: Lead): Promise<string> {
-    const searchQuery = `${lead.name} ${lead.companyWebsite} background experience`;
-    const searchResults = await this.searchTool.call(searchQuery);
+    const searchQuery = `${lead.name} ${lead.company} ${lead.website} background experience`;
+    const searchResults = await this.searchTool.invoke(searchQuery);
     
     // Use the LLM to summarize and structure the research results
     const summary = await this.summarizeResearch(searchResults);
@@ -29,8 +29,20 @@ export class ResearchAgent {
   }
 
   private async summarizeResearch(results: string): Promise<string> {
-    // Use the LLM to generate a concise summary of the research
-    // This is a placeholder implementation
-    return results;
+    const prompt = `
+      Summarize the following research results about a potential lead:
+      ${results}
+      
+      Focus on:
+      - Professional background
+      - Current role and responsibilities
+      - Notable achievements
+      - Company information
+      
+      Provide a concise, well-structured summary.
+    `;
+
+    const response = await this.model.invoke(prompt);
+    return response.content;
   }
 }
