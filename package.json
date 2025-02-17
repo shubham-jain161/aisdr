@@ -8,13 +8,13 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "ts-node --esm src/tests/leadGenerator.test.ts"  // Add this line
+    "test": "ts-node --esm src/tests/leadGenerator.test.ts"
   },
   "dependencies": {
     "@azure/communication-email": "^1.0.0",
     "@langchain/community": "^0.3.30",
     "@langchain/openai": "^0.0.21",
-    "@mendable/firecrawl-js": "^1.4.3",
+    "@mendable/firecrawl-js": "0.0.13",
     "clsx": "^2.1.1",
     "langchain": "^0.1.37",
     "lucide-react": "^0.344.0",
@@ -35,12 +35,9 @@
     "globals": "^15.9.0",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
-    "ts-node": "^10.9.2",           // Add this line
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.3.0",
     "vite": "^5.4.2"
-  },
-  "resolutions": {
-    "@mendable/firecrawl-js": "^1.4.3"
   }
 }
