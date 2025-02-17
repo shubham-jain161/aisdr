@@ -1,11 +1,27 @@
-import { DuckDuckGoSearchResults } from "@langchain/community/tools/duckduckgo";
+import { Tool } from "@langchain/core/tools";
 import { ChatOpenAI } from "@langchain/openai";
 import { AZURE_OPENAI_CONFIG } from "../config/azure";
 import type { Lead, SearchFilters } from "../types";
 
+class DuckDuckGoSearch extends Tool {
+  name = "duckduckgo-search";
+  description = "A tool for searching DuckDuckGo";
+
+  async _call(query: string): Promise<string> {
+    try {
+      const response = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json`);
+      const data = await response.json();
+      return JSON.stringify(data.RelatedTopics);
+    } catch (error) {
+      console.error('DuckDuckGo search error:', error);
+      return '[]';
+    }
+  }
+}
+
 export class LeadGeneratorAgent {
   private model: ChatOpenAI;
-  private searchTool: DuckDuckGoSearchResults;
+  private searchTool: DuckDuckGoSearch;
 
   constructor() {
     this.model = new ChatOpenAI({
@@ -15,12 +31,12 @@ export class LeadGeneratorAgent {
       azureOpenAIBasePath: AZURE_OPENAI_CONFIG.azureOpenAIBasePath,
     });
     
-    this.searchTool = new DuckDuckGoSearchResults();
+    this.searchTool = new DuckDuckGoSearch();
   }
 
   async generateLeads(filters: SearchFilters): Promise<Lead[]> {
     const searchQuery = this.buildSearchQuery(filters);
-    const searchResults = await this.searchTool.invoke(searchQuery);
+    const searchResults = await this.searchTool.call(searchQuery);
     
     // Process search results and extract lead information
     const leads = await this.processSearchResults(searchResults);
